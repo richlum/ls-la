@@ -9,7 +9,9 @@ let filescan = function(pth){
 		let fullpath = path.resolve(pth);
 		fs.readdir(fullpath, function(err, files){
 			if (err) return reject(err);
-			return resolve(files);
+			return resolve(files.map((fl) => {
+				return path.resolve(pth,fl); 
+			}));
 		});
 	});
 
@@ -56,7 +58,12 @@ let classifyFile = function (fileobjarray){
 		
 
 
-let startdir = path.resolve("..");
+let startdir = path.resolve(".");
+if (process.argv.length > 2){
+	startdir = process.argv[2];
+}
+
+
 console.log('startdir',startdir);
 
 let fileobjs = filescan(startdir).then( mapFiles)
