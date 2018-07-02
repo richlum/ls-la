@@ -3,20 +3,20 @@ let path = require('path');
 
 //console.log(__dirname);
 
-
+// input single dir, output array of filenames
 let filescan = function(pth){
 	return new Promise(function(resolve,reject){
-		let fullpath = path.resolve(pth);
-		fs.readdir(fullpath, function(err, files){
+		fs.readdir(pth, function(err, files){
 			if (err) return reject(err);
 			return resolve(files.map((fl) => {
 				return path.resolve(pth,fl); 
 			}));
 		});
 	});
-
 }
 
+
+// input fn , output true/false
 let isDir = function (fn){
 	return new Promise(function(resolve,reject){
 		fs.stat(fn,function(err,stats){
@@ -26,6 +26,8 @@ let isDir = function (fn){
 	});
 }
 
+
+// input array of filenames, output array of object
 let mapFiles = function (filesarray) {
 	let fileobjarray =	filesarray.map( (filename) => {
 				let fileobj = {};
@@ -33,13 +35,12 @@ let mapFiles = function (filesarray) {
 				return fileobj;
 				//fileobj.isDir = isDir(filename);
 	});
-	//console.log('filesarray',filesarray);
-	//console.log('fileobjarray',fileobjarray);
 	return fileobjarray;
 };	
 
+
+
 let is_dir = function(fl_obj){
-	//console.log('fl_obj',fl_obj);
 	return new Promise(function (resolve,reject){
 		fs.stat(fl_obj.name , function (err,stats){
 			if (err) return reject(err);
