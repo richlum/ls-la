@@ -6,10 +6,11 @@ let build = function (basepath){
 	return new Promise(function(resolve,reject){
 		fs.readdir(basepath,function(err,files){
 			if(err)return reject(err);
-			files.map( (file) => {
+			let pathfiles = files.map( (file) => {
 				return path.resolve(basepath,file)
 			});
-			return resolve(files);
+			console.log(12,pathfiles);
+			return resolve(pathfiles);
 		});
 	});
 }
