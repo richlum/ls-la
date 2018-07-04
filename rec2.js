@@ -11,6 +11,26 @@ let build = function (basepath){
 	});
 }
 
+let classify = function (basepath,fnarray){
+	let result = {};
+	return new Promise(function(resolve,reject){
+		fnarray.map( (fn) => {
+			fullname = path.resolve(basepath,fn);
+			subfiles = [];
+			fs.stat(fullname,function(err,stats){
+				if (err) then reject(err);
+				if (stats.isDirectory()){
+					result.dirname = fn;	
+				} else {
+					result.filename = fn;
+				}
+			});
+			return result;
+		});
+		resolve (fnarray
+	
+
+
 let target = '.';
 if (process.argv.length > 2)
 	target = process.argv[2];
