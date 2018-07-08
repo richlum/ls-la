@@ -1,10 +1,23 @@
 target .
-build { basepath: '.',
+108 [ '.git',
+  '.gitignore',
+  '.rec2.js.swp',
+  '.rec3.js.swp',
+  'aa',
+  'bb',
+  'ls-la.js',
+  'package.json',
+  'README.md',
+  'rec2.js',
+  'rec3.js',
+  'recdir.js' ]
+55 [ '.git', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+58 [ '.git' ]
+110 { dirs: [ '.git' ],
   files: 
-   [ '.git',
-     '.gitignore',
-     '.rec2.js.swo',
+   [ '.gitignore',
      '.rec2.js.swp',
+     '.rec3.js.swp',
      'aa',
      'bb',
      'ls-la.js',
