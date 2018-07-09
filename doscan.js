@@ -21,6 +21,10 @@ recurse.scandir(rootdir)
 	console.log(20,x);
 	return recurse.copyfiles(x);
 })
+.then( (x) => {
+	console.log(25,x);
+	return recurse.dirnameToDirObj(x);
+})
 .catch(console.error)
 
 

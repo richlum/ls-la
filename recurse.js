@@ -178,9 +178,39 @@ function copyfiles(obj){
 	});
 }
 
+function hasDirStr( dirlist){
+	if(dirlist.length>0){
+		let dirstrs = dirlist.filter( (name) => ((typeof name) === 'string') );
+		return dirstrs.length > 0;
+	}
+}
+function dirnameToDirObj( root ){
+	
+	if ((root.dirs)&&(hasDirStr(root.dirs))) {
+		let newDirList = root.dirs.map( (dirname) => {
+			dirsubobj = {};
+			dirsubobj.files = [];
+			dirsubobj.dirs = [];
+			dirsubobj.fullpath = dirname;
+			dirobj = (typeof dirname) === 'string' 
+				? dirsubobj 
+				: dirname;
+			return dirobj;
+		});
+		root.dirs = newDirList;	
+		console.log('dirnameToDirObj',root);
+	}
+}
+
+
+
+
+
 exports.dir = dir;
 exports.isdir = isdir;
 exports.filesOnly = filesOnly;
 exports.dirsOnly = dirsOnly;
 exports.copydirs = copydirs;
 exports.copyfiles = copyfiles;
+exports.dirnameToDirObj = dirnameToDirObj;
+

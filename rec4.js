@@ -52,7 +52,7 @@ let classify = function(filesarray){
   //console.log(51,fileobj);
 	let result = Promise.all(fileobj.dirs)
 		.then ( (dirs) => {
-//			console.log(55,dirs);
+		//			console.log(55,dirs);
 			fileobj.dirs = dirs.filter( (file) => { 
 				return file != 0; 
 			});
