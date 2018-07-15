@@ -4,8 +4,14 @@ const path = require('path');
 const config = require('./config');
 
 let fullroot;
+interface dirobj{
+	dirs: string[],
+	files: string[],
+	fullpath:string
+}
 
-function dir(root){
+
+function dir(root:string):Promise<string[]>{
 	fullroot = path.resolve(root);
 	return new Promise(function(resolve,reject){
 		fs.readdir(root,function(err,files){
@@ -22,7 +28,7 @@ function dir(root){
 	});
 }
 
-function isdir(file){
+function isdir(file:string):Promise<boolean>{
 	return new Promise(function(resolve,reject){
 		fs.stat(file,function(err,stats){
 			if(err) return reject(err);
@@ -31,7 +37,10 @@ function isdir(file){
 	});
 }
 
-function filterOnly(files, filterfunc, type){
+interface FilterFunc{
+		(isdir:boolean,type:FilterType):boolean; // will this accept an array of string?
+}
+function filterOnly(files:string[], filterfunc:FilterFunc, type:FilterType):Promise<Promise<string>[]>{
 	let resultlist = files.map(file => new Promise(function(resolve,reject){
 		isdir(file)
 		.then( (isdir) => { 
@@ -55,41 +64,52 @@ function filterOnly(files, filterfunc, type){
 		});
 }
 
-const onlyfiles = 'FILES';
-const onlydirs  = 'DIRS';
-function filterPass( isdir, type){
-	if (type === onlyfiles)	{
+// const onlyfiles = 'FILES';
+// const onlydirs  = 'DIRS';
+enum FilterType {
+	FILES,
+	DIRS
+}
+function filterPass( isdir:boolean, type:FilterType){
+	if (type === FilterType.FILES )	{
 		return !isdir;
 	} 
 	return isdir;
 } 
-function filesOnly(files){
-	return filterOnly(files,filterPass,onlyfiles);
+interface FileFilter<T> {
+	(	files:T[],filterPass:FilterFunc,cond:FilterType):T[];
 }
-function dirsOnly(files){
-	return filterOnly(files,filterPass,onlydirs);
+function filesOnly(files:string[]){
+	return filterOnly(files,filterPass,FilterType.FILES);
+}
+function dirsOnly(files:string[]){
+	return filterOnly(files,filterPass,FilterType.DIRS);
 }
 
-exports.scandir = function scandir(root) {
+exports.scandir = function scandir(root:string):Promise<dirobj> {
 	return new Promise(function(resolve,reject){
 		dir (root)
 		.then( (allfiles) => {
 			return Promise.all([ filesOnly(allfiles),
-			  					 dirsOnly(allfiles)])
+			  					 dirsOnly(allfiles )])
 				.then( (results) => {
-				let cwd = {};
-				cwd.files = results[0];
-				cwd.dirs  = results[1];
-				cwd.fullpath = path.resolve(root);
-				return resolve(cwd);
-			})
-			.catch( err => { return reject(err);  });
+					let cwd:dirobj = {
+						files : results[0],
+						dirs : results[1],
+						fullpath : path.resolve(root)
+					};
+					cwd.files = results[0];
+					cwd.dirs  = results[1];
+					cwd.fullpath = path.resolve(root);
+					return resolve(cwd);
+				})
+				.catch( err => { return reject(err);  });
 		})
 		.catch(console.error);
 	});
 }
 
-function makeoutdir(){
+function makeoutdir():Promise<any>{
 	return new Promise(function(resolve,reject){
 		let targetdir = config.out;
 		fs.mkdir( targetdir , function(err){
@@ -104,11 +124,13 @@ function makeoutdir(){
 		//Promise.reject(err);
 	});
 }
-	
-function copydirs(obj){
+
+
+function copydirs(obj:dirobj):Promise<any>{
 	let count = 0;
 	let dirlist = obj.dirs;
 	return new Promise(function(resolve,reject){
+		let obj = obj;
 		makeoutdir()
 		.then( (outdir) => {
 			if (!outdir) return resolve(0);
@@ -125,11 +147,12 @@ function copydirs(obj){
 					count++;
 					if (count>=dirlist.length){
 						console.log(126,obj);
-						resolve(obj);
+						return Promise.resolve(obj);
 					}
 				});
 			});
-		})
+			return  Promise.resolve(obj);
+		}).then( x => x )
 		.catch((err) => {
 			return reject(err);
 		});
@@ -138,7 +161,7 @@ function copydirs(obj){
 }
 
 
-function copyfile(file,dst){
+function copyfile(file:string,dst:string):Promise<string>{
 	return new Promise(function(resolve,reject){
 		fs.copyFile(file,dst,function(err){
 			if (err) {
@@ -150,7 +173,7 @@ function copyfile(file,dst){
 }
 
 
-function copyfiles(obj){
+function copyfiles(obj:dirobj):Promise<dirobj>{
 	let targetdir = config.out;
 	let files = obj.files;
 	return new Promise(function (resolve,reject){
@@ -166,11 +189,11 @@ function copyfiles(obj){
 			if (cnt >= files.length){
 				console.log(149,obj);
 				Promise.all(copyfilelist)
-				.then( resolve(obj) ) ;
+				.then( () => {return resolve(obj) }) ;
 			} 
 		});
 		Promise.all(copyfilelist)
-		.then( resolve(obj) )
+		.then( () => { return resolve(obj) })
 		.catch( (err) => {
 			return reject(err) ;
 		});
@@ -178,7 +201,7 @@ function copyfiles(obj){
 	});
 }
 
-function hasDirStr( dirlist){
+function hasDirStr( dirlist:string[]){
 	if(dirlist.length>0){
 		let dirstrs = dirlist.filter( (name) => ((typeof name) === 'string') );
 		return dirstrs.length > 0;
