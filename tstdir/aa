@@ -1,0 +1,48 @@
+71 [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/aa',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/bb',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/config.json',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: false } ]
+88 [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/aa',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/bb',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/config.json',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: false } ]
+19 4
+23 [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: true } ]
+28 'dirs' [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: true } ]
+31 1 { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+  isdir: true }
+52 'resolving updateDirs' [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/aa',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/bb',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/config.json',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: true } ]
+98 [ { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/aa',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/bb',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/config.json',
+    isdir: false },
+  { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+    isdir: true } ]
+71 []
+88 []
+19 0
+23 []
+52 'resolving updateDirs' []
+40 'dir' { fullpath: '/home/rlum/Documents/proj/ls-la/tstdir/subdir',
+  isdir: true,
+  dirfiles: [] }
+45 'async resolve'
