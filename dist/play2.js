@@ -5,6 +5,25 @@ if (process.argv.length > 2)
     basedir = process.argv[2];
 let fullroot = path.resolve(basedir);
 console.log(`basedir = ${basedir} fullroot = ${fullroot}`);
+let filelist = [];
+let dirlist = [];
+// const walk:(fileobj:FileObject)=>Promise<Files> = (fileobj) => {
+//   let result:Files = {
+//     files:[],
+//     dirs:[]
+//   }
+//   if ((!fileobj)||(!fileobj.fileobjs)) return Promise.resolve(result);
+//   let dirobjs:FileObject[]  = (fileobj.fileobjs.filter( fobj =>  fobj.isdir))
+//   let fileobjs:FileObject[] = (fileobj.fileobjs.filter( fobj => !fobj.isdir))
+//   dirobjs.forEach( dirobj => {
+//     if (dirobj&&dirobj.fileobjs)
+//       let dirsublist:string[] = dirobj.fileobjs.map( (fobj) => {
+//         fobj => fobj.fileobjs})
+//       result.dirs.push( dirsublist )
+//     })
+//   }
+//   result.dirs.push
+// }
 const isdir = function isdir(fileobj) {
     console.log(24, 'isdir', fileobj);
     return new Promise(function (resolve, reject) {
@@ -18,7 +37,6 @@ const isdir = function isdir(fileobj) {
 };
 const fnToFileObj = (pathname) => {
     console.log(33, 'fnToFileObj', pathname);
-    // if ((!pathname)||(pathname.length===0)) pathname = path.resolve(name)
     let fileobj = {
         name: path.basename(pathname),
         fullpath: pathname
@@ -66,29 +84,6 @@ const getSubFileObjs = (fileobj) => new Promise((resolve, reject) => {
         .then((fileobj) => {
         return resolve(fileobj);
     })
-        // if (!fileobj||!fileobj.isdir) return resolve(fileobj)
-        // let filelist:string[]|undefined = fileobj.files;
-        // if (!filelist) return Promise.resolve(fileobj)
-        // let dirobjs:Promise<FileObject>[] = filelist.map( fl => fnToFileObj(fl))
-        // Promise.all(dirobjs)
-        // .then( dirobjs => {
-        //   console.log(88, 'getSubFileObjs',dirobjs)
-        //   fileobj.fileobjs = dirobjs;
-        //   dirobjs.map(dirobj => isdir(dirobj).then(subFiles)
-        //   console.log(91,'getSubFileObjs',fileobj)
-        //   return resolve (fileobj)
-        // })
-        // fileobj.fileobjs.filter( fo => fo.isdir)
-        // dirobjs.forEach( dir => {
-        //   console.log (85, 'getSubFileObjs',dir)
-        //   return subFiles(dir)
-        // })
-        // console.log(86, 'getSubFileObjs' , dirobjs)
-        // Promise.all(dirobjs)
-        // .then( (dirobjs) =>{
-        //   fileobj.fileobjs = dirobjs;
-        //   return resolve(fileobj)
-        // })
         .catch(console.error);
 });
 const subFiles = (filobj) => new Promise((resolve, reject) => {
