@@ -7,36 +7,31 @@ let fullroot = path.resolve(basedir);
 console.log(`basedir = ${basedir} fullroot = ${fullroot}`);
 let filelist = [];
 let dirlist = [];
+// module level object to hold our result
 let aflatobj = {
     files: [],
     dirs: []
 };
+// flatobj is our accumulator as we recurse down the fileobj
 const walk = (fileobj, flatobj) => {
     let result = {
         files: [],
         dirs: []
     };
     if ((!fileobj) || (!fileobj.fileobjs)) {
-        console.log(35, "walk returning no filobj");
         return Promise.resolve(result);
     }
     let dirs = (fileobj.fileobjs.filter(fobj => fobj.isdir).map(fobj => fobj.fullpath));
     let fils = (fileobj.fileobjs.filter(fobj => !fobj.isdir).map(fobj => fobj.fullpath));
-    console.log(41, 'walk dirs');
-    console.log(JSON.stringify(dirs, null, 2));
-    console.log(43, 'walk file');
-    console.log(JSON.stringify(fils, null, 2));
     flatobj.files = flatobj.files.concat(fils);
     flatobj.dirs = flatobj.dirs.concat(dirs);
     fileobj.fileobjs.filter(fobj => fobj.isdir)
         .forEach(fobj => {
         walk(fobj, flatobj);
     });
-    console.log(59, 'walk returning file', flatobj.files.length, flatobj.dirs.length);
     return Promise.resolve(flatobj);
 };
 const isdir = function isdir(fileobj) {
-    console.log(24, 'isdir', fileobj);
     return new Promise(function (resolve, reject) {
         fs.stat(fileobj.fullpath, function (err, stats) {
             if (err)
@@ -47,12 +42,10 @@ const isdir = function isdir(fileobj) {
     });
 };
 const fnToFileObj = (pathname) => {
-    console.log(33, 'fnToFileObj', pathname);
     let fileobj = {
         name: path.basename(pathname),
         fullpath: pathname
     };
-    console.log(38, 'fnToFileObj', fileobj);
     return Promise.resolve(fileobj);
 };
 const populateFiles = function populateDirFiles(dirobj) {
@@ -83,12 +76,11 @@ const getNodes = (filobj) => new Promise(function (resolve, reject) {
         if (err)
             return reject(err);
         filobj.files = files.map(file => path.join(filobj.fullpath, file));
-        console.log(113, 'getNodes', filobj);
         return resolve(filobj);
     });
 });
+// the recursion loop is between the following two methods  
 const getSubFileObjs = (fileobj) => new Promise((resolve, reject) => {
-    console.log(81, 'getSubFileObjs', fileobj);
     isdir(fileobj)
         .then(getNodes)
         .then(subFiles)
@@ -97,8 +89,8 @@ const getSubFileObjs = (fileobj) => new Promise((resolve, reject) => {
     })
         .catch(console.error);
 });
+// handle the breadth of objs recursing  down if its a directory
 const subFiles = (filobj) => new Promise((resolve, reject) => {
-    console.log(136, 'subFiles', filobj);
     if (!filobj || !filobj.files || filobj.files.length <= 0)
         return resolve(filobj);
     let filobjs = filobj.files.map(file => fnToFileObj(file)
@@ -119,9 +111,7 @@ fnToFileObj(fullroot)
     .then(getNodes)
     .then(subFiles)
     .then((x) => {
-    console.log(155);
     console.log(JSON.stringify(x, null, 2));
-    console.log(157);
     return x;
 })
     .then(x => {

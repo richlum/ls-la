@@ -7,6 +7,15 @@ import { resolve } from "dns";
     or not and what files/subdirectories are contained at 
     each level. Since it is async, hopefully, it runs faster.
 
+    When traversing, its best to keep the constant datastructure 
+    and modify its contents as required and pass the same data 
+    structure around.  Components are broken out to build the
+    structure and then we need to use the same tools as we find
+    new nodes to rebuild the constant structure as we walk the
+    directory.  Turns out typescript is very helpful in keeping
+    the discipline of knowing what types we receive and what
+    types we generate.....
+
     walk takes the json object file object and flattens it
     to a single level json object that contains an array of
     files and an array of directories with full path names
@@ -39,26 +48,23 @@ interface Files{
   files:string[],
   dirs:string[]
 }
+// module level object to hold our result
 let aflatobj:Files = {
   files:[],
   dirs:[]
 }
 
+// flatobj is our accumulator as we recurse down the fileobj
 const walk:(fileobj:FileObject, flatobj:Files )=>Promise<Files> = (fileobj,flatobj) => {
   let result:Files = {
     files:[],
     dirs:[]
   }
   if ((!fileobj)||(!fileobj.fileobjs)) {
-    console.log(35, "walk returning no filobj")
     return Promise.resolve(result);
   }
   let dirs:string[]  = (fileobj.fileobjs.filter( fobj =>  fobj.isdir).map(fobj => fobj.fullpath))
   let fils:string[] = (fileobj.fileobjs.filter( fobj => !fobj.isdir).map(fobj => fobj.fullpath))
-  console.log(41,'walk dirs')
-  console.log(JSON.stringify(dirs,null,2))
-  console.log(43,'walk file')
-  console.log(JSON.stringify(fils,null,2))
 
   flatobj.files = flatobj.files.concat(fils);
   flatobj.dirs  = flatobj.dirs.concat(dirs);
@@ -68,13 +74,11 @@ const walk:(fileobj:FileObject, flatobj:Files )=>Promise<Files> = (fileobj,flato
     walk(fobj,flatobj)
   })
 
-  console.log(59, 'walk returning file', flatobj.files.length, flatobj.dirs.length)
   return Promise.resolve(flatobj)
 }
 
 
 const isdir = function isdir(fileobj:FileObject):Promise<FileObject>{
-  console.log(24,'isdir',fileobj)
   return new Promise(function(resolve,reject){
     fs.stat(fileobj.fullpath,function(err,stats){
       if (err) return reject(err);
@@ -85,12 +89,10 @@ const isdir = function isdir(fileobj:FileObject):Promise<FileObject>{
 }
 
 const fnToFileObj:(pathname:string)=>Promise<FileObject> = (pathname) => {
-  console.log(33, 'fnToFileObj', pathname)
   let fileobj:FileObject = {
     name : path.basename(pathname),
     fullpath: pathname
   }
-  console.log(38,'fnToFileObj',fileobj)
   return Promise.resolve(fileobj);
 }
 
@@ -122,30 +124,27 @@ const getNodes = (filobj:FileObject):Promise<FileObject> =>
     fs.readdir(filobj.fullpath,function(err,files){
       if (err) return reject(err)
       filobj.files = files.map( file => path.join(filobj.fullpath,file))
-      console.log(113,'getNodes',filobj)
       return resolve(filobj)
     })
   })
 
 
+// the recursion loop is between the following two methods  
 const getSubFileObjs:(fileobj:FileObject)=>Promise<FileObject> = (fileobj) => 
   new Promise( (resolve,reject) => {
-    console.log(81,'getSubFileObjs',fileobj)
-
+    
     isdir(fileobj)
     .then(getNodes)
     .then(subFiles)
     .then(  (fileobj) => {
-
       return resolve(fileobj)
     })
     .catch(console.error)
   })
 
-
+// handle the breadth of objs recursing  down if its a directory
 const subFiles = (filobj:FileObject):Promise<FileObject> =>
   new Promise( (resolve,reject) =>{
-    console.log(136,'subFiles',filobj)
     if (!filobj||!filobj.files||filobj.files.length<=0)
       return resolve(filobj)
     let filobjs:Promise<FileObject>[] = filobj.files.map( file => fnToFileObj(file)
@@ -171,9 +170,7 @@ fnToFileObj(fullroot)
 .then(getNodes)
 .then(subFiles)
 .then( (x) => { 
-    console.log(155);
     console.log(JSON.stringify(x,null,2))
-    console.log(157)
     return x;
   })
 .then( x => {
